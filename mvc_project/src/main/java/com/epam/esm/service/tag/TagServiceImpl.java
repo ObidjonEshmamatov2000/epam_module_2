@@ -21,6 +21,10 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public BaseResponseDto<Tag> create(Tag tag) {
+        if (tag == null || tag.getName() == null) {
+            return new BaseResponseDto<>(-1, "unknown tag name");
+        }
+
         tag.setId(UUID.randomUUID());
         int create = tagDao.create(tag);
 

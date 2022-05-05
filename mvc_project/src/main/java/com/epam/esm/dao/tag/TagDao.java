@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface TagDao extends BaseDao<Tag> {
     void createWithGiftCertificate(UUID certificateId, List<Tag> tags);
-
+    Tag getTagByName(String tagName);
 }

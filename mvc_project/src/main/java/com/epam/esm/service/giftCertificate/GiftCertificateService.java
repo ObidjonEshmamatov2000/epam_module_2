@@ -8,7 +8,8 @@ import java.util.List;
 
 
 public interface GiftCertificateService extends BaseService<GiftCertificateDto> {
-    BaseResponseDto<List<GiftCertificateDto>> getAll();
+    BaseResponseDto<List<GiftCertificateDto>> getAll(
+            String searchWord, String tagName, boolean doNameSort, boolean doDateSort, boolean isDescending
+    );
     BaseResponseDto<GiftCertificateDto> update(GiftCertificateDto update);
-    BaseResponseDto<List<GiftCertificateDto>> getByTagName(String tagName);
 }

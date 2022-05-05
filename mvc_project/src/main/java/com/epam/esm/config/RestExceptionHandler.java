@@ -31,4 +31,11 @@ public class RestExceptionHandler
                 new BaseResponseDto<>(-1, "this action violets foreign key constraint in PostgreSQL")
         );
     }
+
+    @ExceptionHandler(ClassNotFoundException.class)
+    public ResponseEntity<?> classNotFoundExceptionHandler(Exception e){
+        return ResponseEntity.ok(
+                new BaseExceptionDto(500, e.getLocalizedMessage(), 10500)
+        );
+    }
 }

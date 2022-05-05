@@ -5,6 +5,7 @@ import com.epam.esm.dao.tag.TagDao;
 import com.epam.esm.dto.BaseResponseDto;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.model.giftCertificate.GiftCertificate;
+import com.epam.esm.model.tag.Tag;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -72,10 +75,48 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
 
 
     @Override
-    public BaseResponseDto<List<GiftCertificateDto>> getAll() {
-        List<GiftCertificate> all = giftCertificateDao.getAll();
+    public BaseResponseDto<List<GiftCertificateDto>> getAll(
+            String searchWord, String tagName, boolean doNameSort, boolean doDateSort, boolean isDescending
+    ) {
 
-        return new BaseResponseDto<List<GiftCertificateDto>>(1, "success", convertToDto(all));
+        List<GiftCertificate> certificateList = getCertificateList(searchWord, tagName);
+        List<GiftCertificateDto> giftCertificateDtos = convertToDto(sortCertificateList(
+                doNameSort, doDateSort, isDescending, certificateList
+        ));
+        return new BaseResponseDto<>(1, "success", giftCertificateDtos);
+    }
+
+    private List<GiftCertificate> getCertificateList(String searchWord, String tagName) {
+        if (searchWord != null) {
+            if (tagName != null) {
+                tagName = tagName.toLowerCase();
+                return giftCertificateDao.searchAndGetByTagName(searchWord, tagName);
+            }
+            return giftCertificateDao.searchByNameOrDescription(searchWord);
+        } else if (tagName != null)
+            return giftCertificateDao.getByTagName(tagName);
+
+        return giftCertificateDao.getAll();
+    }
+
+    private List<GiftCertificate> sortCertificateList(
+            boolean doNameSort, boolean doDateSort, boolean isDescending, List<GiftCertificate> certificateList) {
+
+        if (doNameSort) {
+            if (doDateSort)
+                certificateList.sort(
+                        Comparator.comparing(GiftCertificate::getName)
+                                .thenComparing(c -> ZonedDateTime.parse(c.getCreateDate())));
+            else
+                certificateList.sort(Comparator.comparing(GiftCertificate::getName));
+        } else if (doDateSort)
+            certificateList.sort(
+                    Comparator.comparing((GiftCertificate c) -> ZonedDateTime.parse(c.getCreateDate())));
+
+        if(isDescending)
+            Collections.reverse(certificateList);
+
+        return certificateList;
     }
 
     private List<GiftCertificateDto> convertToDto(List<GiftCertificate> certificates) {
@@ -106,18 +147,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
             return new BaseResponseDto<>(1, "success");
         }
         return new BaseResponseDto<>(0, "failed to update");
-    }
-
-    @Override
-    public BaseResponseDto<List<GiftCertificateDto>> getByTagName(String tagName) {
-        List<GiftCertificate> byTagName = giftCertificateDao.getByTagName(tagName);
-
-        if (byTagName.size() == 0 ) {
-            return new BaseResponseDto<>(0, "no gift certificate found");
-        }
-
-
-        return new BaseResponseDto<>(1, "success");
     }
 
     @JsonIgnore

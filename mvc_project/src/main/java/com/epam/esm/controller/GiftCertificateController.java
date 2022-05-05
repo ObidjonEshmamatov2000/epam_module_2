@@ -20,18 +20,20 @@ public class GiftCertificateController {
     }
 
     @RequestMapping(value = "/get_list", method = RequestMethod.GET, headers = "Accept=application/json")
-    public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(giftCertificateService.getAll());
+    public ResponseEntity<?> getAll(
+            @RequestParam(required = false) String searchWord,
+            @RequestParam(required = false) String byTagName,
+            @RequestParam(required = false) boolean doNameSort,
+            @RequestParam(required = false) boolean doDateSort,
+            @RequestParam(required = false) boolean isDescending
+    ){
+        return ResponseEntity.ok(giftCertificateService.getAll(
+                searchWord, byTagName, doNameSort, doDateSort, isDescending));
     }
 
     @RequestMapping(value = "/get", method = RequestMethod.GET, headers = "Accept=application/json")
     public ResponseEntity<?> get(@RequestParam("id") UUID id) {
         return ResponseEntity.ok(giftCertificateService.get(id));
-    }
-
-    @RequestMapping(value = "/get_tag", method = RequestMethod.GET, headers = "Accept=application/json")
-    public ResponseEntity<?> getByTagName(@RequestParam String name) {
-        return ResponseEntity.ok(giftCertificateService.getByTagName(name));
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, headers = "Accept=application/json")
