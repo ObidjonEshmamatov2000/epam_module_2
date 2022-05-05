@@ -35,6 +35,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     @Override
     public BaseResponseDto<GiftCertificateDto> create(GiftCertificateDto giftCertificateDto) {
         giftCertificateDto.setCreateDate(getCurrentTimeInIso8601());
+        giftCertificateDto.setLastUpdateDate(getCurrentTimeInIso8601());
         giftCertificateDto.setId(UUID.randomUUID());
 
         int created = giftCertificateDao.create(modelMapper.map(giftCertificateDto, GiftCertificate.class));
@@ -88,6 +89,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     public BaseResponseDto<GiftCertificateDto> update(GiftCertificateDto update) {
         GiftCertificate old = giftCertificateDao.get(update.getId());
         update.setLastUpdateDate(getCurrentTimeInIso8601());
+
+        if (update.getDuration() <= 0)
+        update.setDuration(old.getDuration());
+
+        if (update.getPrice() <= 0)
+        update.setPrice(old.getPrice());
 
         modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         modelMapper.map(update, old);

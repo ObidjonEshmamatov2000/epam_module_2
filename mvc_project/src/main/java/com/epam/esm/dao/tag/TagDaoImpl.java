@@ -43,7 +43,7 @@ public class TagDaoImpl implements TagDao{
         tags.forEach(tag -> {
             tag.setId(UUID.randomUUID());
             jdbcTemplate.update("insert into tag(id, name) values(?, ?)", tag.getId(), tag.getName());
-            jdbcTemplate.update("insert in gift_certificate_tag(tag_id, gift_certificate_id) values(?, ?)", tag.getId(), certificateId);
+            jdbcTemplate.update("insert into gift_certificate_tag(tag_id, gift_certificate_id) values(?, ?)", tag.getId(), certificateId);
         });
     }
 }

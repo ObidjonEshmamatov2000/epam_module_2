@@ -47,18 +47,19 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public int update(GiftCertificate gc) {
-        return jdbcTemplate.update("update gift_certificate" +
-                "set name = ?," +
-                "description = ?," +
-                "price = ?," +
-                "duration = ?," +
-                "last_update_date = ?" +
-                "where id = ?;",
+        return jdbcTemplate.update("update gift_certificate " +
+                "set name = ?, " +
+                "description = ?, " +
+                "price = ?, " +
+                "duration = ?, " +
+                "last_updated_date = ? " +
+                "where id = ?; ",
                 gc.getName(),
                 gc.getDescription(),
                 gc.getPrice(),
                 gc.getDuration(),
-                gc.getLastUpdateDate());
+                gc.getLastUpdateDate(),
+                gc.getId());
     }
 
     @Override

@@ -24,9 +24,4 @@ public class GiftCertificate {
     private int duration;
     private String createDate;
     private String lastUpdateDate;
-
-    @JsonIgnore
-    public String getCurrentTimeInIso8601() {
-        return ZonedDateTime.now( ZoneOffset.UTC ).format( DateTimeFormatter.ISO_INSTANT );
-    }
 }
