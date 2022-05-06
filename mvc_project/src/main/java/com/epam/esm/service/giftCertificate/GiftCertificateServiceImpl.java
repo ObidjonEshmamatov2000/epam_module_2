@@ -82,49 +82,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     public BaseResponseDto<List<GiftCertificateDto>> getFilteredGifts(
             String searchWord, String tagName, boolean doNameSort, boolean doDateSort, boolean isDescending
     ) {
+        List<GiftCertificate> filteredGifts = giftCertificateDao.getFilteredGifts(
+                searchWord, tagName, doNameSort, doDateSort, isDescending);
 
-        List<GiftCertificate> certificateList = getCertificateListByFilterWord(searchWord, tagName);
-
-        if(certificateList.size() == 0)
+        if (filteredGifts.size() == 0)
             return new BaseResponseDto<>(0, "no certificates found");
 
-        List<GiftCertificateDto> giftCertificateDtos = convertToDto(sortCertificateList(
-                doNameSort, doDateSort, isDescending, certificateList
-        ));
-        return new BaseResponseDto<>(1, "success", giftCertificateDtos);
-    }
-
-    private List<GiftCertificate> sortCertificateList(
-            boolean doNameSort, boolean doDateSort, boolean isDescending, List<GiftCertificate> certificateList) {
-
-        if (doNameSort) {
-            if (doDateSort)
-                certificateList.sort(
-                        Comparator.comparing(GiftCertificate::getName)
-                                .thenComparing(GiftCertificate::getCreateDate));
-            else
-                certificateList.sort(Comparator.comparing(GiftCertificate::getName));
-        } else if (doDateSort)
-            certificateList.sort(
-                    Comparator.comparing(GiftCertificate::getCreateDate));
-
-        if(isDescending)
-            Collections.reverse(certificateList);
-
-        return certificateList;
-    }
-
-    private List<GiftCertificate> getCertificateListByFilterWord(String searchWord, String tagName) {
-        if (searchWord != null) {
-            if (tagName != null) {
-                tagName = tagName.toLowerCase();
-                return giftCertificateDao.searchAndGetByTagName(searchWord, tagName);
-            }
-            return giftCertificateDao.searchByNameOrDescription(searchWord);
-        } else if (tagName != null)
-            return giftCertificateDao.getByTagName(tagName);
-
-        return giftCertificateDao.getAll();
+        return new BaseResponseDto<>(1, "success", convertToDto(filteredGifts));
     }
 
     private List<GiftCertificateDto> convertToDto(List<GiftCertificate> certificates) {
