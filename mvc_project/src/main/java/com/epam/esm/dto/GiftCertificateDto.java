@@ -25,4 +25,11 @@ public class GiftCertificateDto {
     private String createDate;
     private String lastUpdateDate;
     private List<Tag> tags;
+
+    public GiftCertificateDto(String name, String description, double price, int duration) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.duration = duration;
+    }
 }

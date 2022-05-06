@@ -37,6 +37,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
 
     @Override
     public BaseResponseDto<GiftCertificateDto> create(GiftCertificateDto giftCertificateDto) {
+        if (giftCertificateDto == null || giftCertificateDto.getName() == null) {
+            return new BaseResponseDto<>(-1, "unknown git certificate name");
+        }
+
         giftCertificateDto.setCreateDate(getCurrentTimeInIso8601());
         giftCertificateDto.setLastUpdateDate(getCurrentTimeInIso8601());
         giftCertificateDto.setId(UUID.randomUUID());
@@ -75,7 +79,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
 
 
     @Override
-    public BaseResponseDto<List<GiftCertificateDto>> getAll(
+    public BaseResponseDto<List<GiftCertificateDto>> getFilteredGifts(
             String searchWord, String tagName, boolean doNameSort, boolean doDateSort, boolean isDescending
     ) {
 
@@ -84,6 +88,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
                 doNameSort, doDateSort, isDescending, certificateList
         ));
         return new BaseResponseDto<>(1, "success", giftCertificateDtos);
+    }
+
+    @Override
+    public BaseResponseDto<List<GiftCertificateDto>> getAll() {
+        List<GiftCertificate> all = giftCertificateDao.getAll();
+        return new BaseResponseDto<>(1, "success", convertToDto(all));
     }
 
     private List<GiftCertificate> getCertificateList(String searchWord, String tagName) {
@@ -149,7 +159,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         return new BaseResponseDto<>(0, "failed to update");
     }
 
-    @JsonIgnore
     public String getCurrentTimeInIso8601() {
         return ZonedDateTime.now( ZoneOffset.UTC ).format( DateTimeFormatter.ISO_INSTANT );
     }

@@ -1,6 +1,5 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.dao.giftCertificate.GiftCertificateDao;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.service.giftCertificate.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +18,21 @@ public class GiftCertificateController {
         this.giftCertificateService = giftCertificateService;
     }
 
-    @RequestMapping(value = "/get_list", method = RequestMethod.GET, headers = "Accept=application/json")
-    public ResponseEntity<?> getAll(
+    @RequestMapping(value = "/get_filter", method = RequestMethod.GET, headers = "Accept=application/json")
+    public ResponseEntity<?> getFilteredGifts(
             @RequestParam(required = false) String searchWord,
             @RequestParam(required = false) String byTagName,
             @RequestParam(required = false) boolean doNameSort,
             @RequestParam(required = false) boolean doDateSort,
             @RequestParam(required = false) boolean isDescending
     ){
-        return ResponseEntity.ok(giftCertificateService.getAll(
+        return ResponseEntity.ok(giftCertificateService.getFilteredGifts(
                 searchWord, byTagName, doNameSort, doDateSort, isDescending));
+    }
+
+    @RequestMapping(value = "/get_list", method = RequestMethod.GET, headers = "Accept=application/json")
+    public ResponseEntity<?> getAll() {
+        return ResponseEntity.ok(giftCertificateService.getAll());
     }
 
     @RequestMapping(value = "/get", method = RequestMethod.GET, headers = "Accept=application/json")
