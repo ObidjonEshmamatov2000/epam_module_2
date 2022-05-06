@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
@@ -17,6 +18,8 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
         giftCertificate.setDescription(rs.getString("description"));
         giftCertificate.setPrice(rs.getDouble("price"));
         giftCertificate.setDuration(rs.getInt("duration"));
+//        giftCertificate.setCreateDate(ZonedDateTime.parse(rs.getTime("created_date")));
+//        giftCertificate.setLastUpdateDate(ZonedDateTime.parse(rs.getString("last_updated_date")));
         giftCertificate.setCreateDate(rs.getString("created_date"));
         giftCertificate.setLastUpdateDate(rs.getString("last_updated_date"));
 

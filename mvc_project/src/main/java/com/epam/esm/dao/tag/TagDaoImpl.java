@@ -39,15 +39,6 @@ public class TagDaoImpl implements TagDao{
     }
 
     @Override
-    public void createWithGiftCertificate(UUID certificateId, List<Tag> tags) {
-        tags.forEach(tag -> {
-            tag.setId(UUID.randomUUID());
-            jdbcTemplate.update("insert into tag(id, name) values(?, ?)", tag.getId(), tag.getName());
-            jdbcTemplate.update("insert into gift_certificate_tag(tag_id, gift_certificate_id) values(?, ?)", tag.getId(), certificateId);
-        });
-    }
-
-    @Override
     public Tag getTagByName(String tagName) {
         return jdbcTemplate.queryForObject("select id, name from tag where name = ?", new TagMapper() ,tagName);
     }

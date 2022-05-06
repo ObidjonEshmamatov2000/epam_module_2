@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -16,8 +18,8 @@ public class GiftCertificate {
     private UUID id;
     private String name;
     private String description;
-    private double price;
-    private int duration;
+    private Double price;
+    private Integer duration;
     private String createDate;
     private String lastUpdateDate;
 }

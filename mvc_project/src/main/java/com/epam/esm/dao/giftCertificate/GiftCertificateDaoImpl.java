@@ -106,4 +106,13 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
                 "                                                        );",
                 new GiftCertificateMapper(), searchWord, tagName);
     }
+
+    @Override
+    public void createTagsWithGiftCertificate(UUID certificateId, List<Tag> tags) {
+        tags.forEach(tag -> {
+            tag.setId(UUID.randomUUID());
+            jdbcTemplate.update("insert into tag(id, name) values(?, ?)", tag.getId(), tag.getName());
+            jdbcTemplate.update("insert into gift_certificate_tag(tag_id, gift_certificate_id) values(?, ?)", tag.getId(), certificateId);
+        });
+    }
 }
