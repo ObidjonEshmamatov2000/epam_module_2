@@ -42,4 +42,9 @@ public class TagDaoImpl implements TagDao{
     public Tag getTagByName(String tagName) {
         return jdbcTemplate.queryForObject("select id, name from tag where name = ?", new TagMapper() ,tagName);
     }
+
+    @Override
+    public List<Tag> getGiftCertificateWithTags(UUID id) {
+        return jdbcTemplate.query("select * from get_tags_by_gift_certificate_id(?)", new TagMapper(), id);
+    }
 }

@@ -3,6 +3,7 @@ package com.epam.esm.dao.giftCertificate;
 import com.epam.esm.model.giftCertificate.GiftCertificate;
 import com.epam.esm.model.giftCertificate.GiftCertificateMapper;
 import com.epam.esm.model.tag.Tag;
+import com.epam.esm.model.tag.TagMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 

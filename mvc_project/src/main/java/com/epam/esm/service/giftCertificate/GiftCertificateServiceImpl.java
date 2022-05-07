@@ -1,6 +1,7 @@
 package com.epam.esm.service.giftCertificate;
 
 import com.epam.esm.dao.giftCertificate.GiftCertificateDao;
+import com.epam.esm.dao.tag.TagDao;
 import com.epam.esm.dto.BaseResponseDto;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.model.giftCertificate.GiftCertificate;
@@ -12,8 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,11 +21,13 @@ import java.util.stream.Collectors;
 public class GiftCertificateServiceImpl implements GiftCertificateService{
 
     private final GiftCertificateDao giftCertificateDao;
+    private final TagDao tagDao;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public GiftCertificateServiceImpl(GiftCertificateDao giftCertificateDao, ModelMapper modelMapper) {
+    public GiftCertificateServiceImpl(GiftCertificateDao giftCertificateDao, TagDao tagDao, ModelMapper modelMapper) {
         this.giftCertificateDao = giftCertificateDao;
+        this.tagDao = tagDao;
         this.modelMapper = modelMapper;
     }
 
@@ -88,13 +89,21 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         if (filteredGifts.size() == 0)
             return new BaseResponseDto<>(0, "no certificates found");
 
-        return new BaseResponseDto<>(1, "success", convertToDto(filteredGifts));
+        List<GiftCertificateDto> dtos = convertToDto(filteredGifts);
+
+        return new BaseResponseDto<>(1, "success", addTagsToGiftCertificateDtos(dtos));
     }
 
     private List<GiftCertificateDto> convertToDto(List<GiftCertificate> certificates) {
         return certificates.stream()
                 .map((certificate) ->
                         modelMapper.map(certificate, GiftCertificateDto.class))
+                .collect(Collectors.toList());
+    }
+
+    private List<GiftCertificateDto> addTagsToGiftCertificateDtos(List<GiftCertificateDto> giftCertificateDtos) {
+        return giftCertificateDtos.stream().peek(certificate ->
+                        certificate.setTags(tagDao.getGiftCertificateWithTags(certificate.getId())))
                 .collect(Collectors.toList());
     }
 
