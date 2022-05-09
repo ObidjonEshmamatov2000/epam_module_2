@@ -1,4 +1,4 @@
-package com.epam.esm.model.tag;
+package com.epam.esm.domain.tag;
 
 
 import org.springframework.jdbc.core.RowMapper;

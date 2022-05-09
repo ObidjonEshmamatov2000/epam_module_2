@@ -1,5 +1,7 @@
 package com.epam.esm.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sun.istack.internal.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +11,15 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BaseExceptionDto {
-    private int HttpStatus;
-    private String errorMessage;
-    private int errorCode;
+public class BaseExceptionDto{
+    private Integer status;
+    private String message;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer errorCode;
+
+    public BaseExceptionDto(Integer status, String message) {
+        this.status = status;
+        this.message = message;
+    }
 }

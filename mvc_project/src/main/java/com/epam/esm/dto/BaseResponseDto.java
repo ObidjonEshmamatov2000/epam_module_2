@@ -1,6 +1,5 @@
 package com.epam.esm.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
@@ -14,14 +13,14 @@ import lombok.Setter;
 @Setter
 //@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"httpStatus", "responseMessage", "data"})
+@JsonPropertyOrder({"status", "message", "data"})
 public class BaseResponseDto<T> {
-    private int httpStatus;
-    private String responseMessage;
+    private int status;
+    private String message;
     private T data;
 
-    public BaseResponseDto(int httpStatus, String responseMessage) {
-        this.httpStatus = httpStatus;
-        this.responseMessage = responseMessage;
+    public BaseResponseDto(int status, String responseMessage) {
+        this.status = status;
+        this.message = responseMessage;
     }
 }

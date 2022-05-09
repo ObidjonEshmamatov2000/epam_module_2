@@ -1,11 +1,10 @@
-package com.epam.esm.model.giftCertificate;
+package com.epam.esm.domain.giftCertificate;
 
 
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
@@ -16,12 +15,10 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
         giftCertificate.setId(UUID.fromString(rs.getString("id")));
         giftCertificate.setName(rs.getString("name"));
         giftCertificate.setDescription(rs.getString("description"));
-        giftCertificate.setPrice(rs.getDouble("price"));
+        giftCertificate.setPrice(rs.getBigDecimal("price"));
         giftCertificate.setDuration(rs.getInt("duration"));
-//        giftCertificate.setCreateDate(ZonedDateTime.parse(rs.getTime("created_date")));
-//        giftCertificate.setLastUpdateDate(ZonedDateTime.parse(rs.getString("last_updated_date")));
-        giftCertificate.setCreateDate(rs.getString("created_date"));
-        giftCertificate.setLastUpdateDate(rs.getString("last_updated_date"));
+        giftCertificate.setCreateDate(rs.getTimestamp("created_date").toLocalDateTime());
+        giftCertificate.setLastUpdateDate(rs.getTimestamp("last_updated_date").toLocalDateTime());
 
         return giftCertificate;
     }

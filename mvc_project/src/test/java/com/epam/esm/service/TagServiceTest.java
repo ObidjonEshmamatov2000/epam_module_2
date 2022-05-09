@@ -2,9 +2,8 @@ package com.epam.esm.service;
 
 import com.epam.esm.dao.tag.TagDao;
 import com.epam.esm.dto.BaseResponseDto;
-import com.epam.esm.model.tag.Tag;
+import com.epam.esm.domain.tag.Tag;
 import com.epam.esm.service.tag.TagServiceImpl;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,12 +35,12 @@ public class TagServiceTest {
 
     @Test
     public void testCreateTagMethod() {
-        given(tagDao.create(tag)).willReturn(1);
+        given(tagDao.create(tag)).willReturn(tag);
 
         BaseResponseDto<Tag> tagBaseResponseDto = tagService.create(tag);
 
-        assertEquals(1, tagBaseResponseDto.getHttpStatus());
-        assertEquals("success", tagBaseResponseDto.getResponseMessage());
+        assertEquals(201, tagBaseResponseDto.getStatus());
+        assertEquals("success", tagBaseResponseDto.getMessage());
         Mockito.verify(tagDao, Mockito.times(1)).create(tag);
     }
 
@@ -51,8 +50,8 @@ public class TagServiceTest {
 
         BaseResponseDto<Tag> tagBaseResponseDto = tagService.get(tag.getId());
 
-        assertEquals(1, tagBaseResponseDto.getHttpStatus());
-        assertEquals("success", tagBaseResponseDto.getResponseMessage());
+        assertEquals(200, tagBaseResponseDto.getStatus());
+        assertEquals("success", tagBaseResponseDto.getMessage());
         assertEquals("testTag", tagBaseResponseDto.getData().getName());
 
         Mockito.verify(tagDao, Mockito.times(1)).get(tag.getId());
@@ -74,8 +73,8 @@ public class TagServiceTest {
         BaseResponseDto<List<Tag>> all = tagService.getAll();
 
         assertEquals(3, all.getData().size());
-        assertEquals(1, all.getHttpStatus());
-        assertEquals("success", all.getResponseMessage());
+        assertEquals(200, all.getStatus());
+        assertEquals("success", all.getMessage());
         Mockito.verify(tagDao, Mockito.times(1)).getAll();
     }
 
@@ -84,8 +83,8 @@ public class TagServiceTest {
         given(tagDao.delete(tag.getId())).willReturn(1);
 
         BaseResponseDto<Tag> delete = tagService.delete(tag.getId());
-        assertEquals(1, delete.getHttpStatus());
-        assertEquals("success", delete.getResponseMessage());
+        assertEquals(200, delete.getStatus());
+        assertEquals("success", delete.getMessage());
         Mockito.verify(tagDao, Mockito.times(1)).delete(tag.getId());
     }
 }

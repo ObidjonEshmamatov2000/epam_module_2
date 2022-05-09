@@ -2,8 +2,10 @@ package com.epam.esm.service.tag;
 
 import com.epam.esm.dao.tag.TagDao;
 import com.epam.esm.dto.BaseResponseDto;
-import com.epam.esm.model.tag.Tag;
+import com.epam.esm.domain.tag.Tag;
+import com.epam.esm.exception.BaseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,45 +23,48 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public BaseResponseDto<Tag> create(Tag tag) {
-        if (tag == null || tag.getName() == null) {
-            return new BaseResponseDto<>(-1, "unknown tag name");
-        }
+
+        checkIfTagValid(tag);
 
         tag.setId(UUID.randomUUID());
-        int create = tagDao.create(tag);
+        Tag create = tagDao.create(tag);
 
-        if (create == 1) {
-            return new BaseResponseDto<>(1, "success");
+        if (create == null) {
+            throw new BaseException(404, "failed to create tag");
         }
 
-        return new BaseResponseDto<>(0, "failed to create tag");
+        return new BaseResponseDto<>(HttpStatus.CREATED.value(), "success", create);
+    }
 
+    private void checkIfTagValid(Tag tag) {
+        if (tag == null || tag.getName() == null || tag.getName().trim().length() <= 0) {
+            throw new BaseException(404, "unsatisfied tag name");
+        }
     }
 
     @Override
     public BaseResponseDto<Tag> get(UUID id) {
         Tag tag = tagDao.get(id);
 
-        if (tag != null) {
-            return new BaseResponseDto<>(1, "success", tag);
+        if (tag == null) {
+            throw new BaseException(404, "tag not found");
         }
 
-        return new BaseResponseDto<>(0, "tag not found");
+        return new BaseResponseDto<>(HttpStatus.OK.value(), "success", tag);
     }
 
     @Override
     public BaseResponseDto<Tag> delete(UUID id) {
         int deleted = tagDao.delete(id);
 
-        if (deleted == 1) {
-            return new BaseResponseDto<>(1, "success");
+        if (deleted != 1) {
+            throw new BaseException(404, "failed to delete tag");
         }
-
-        return new BaseResponseDto<>(0, "failed to delete");
+        return new BaseResponseDto<>(HttpStatus.OK.value(), "success");
     }
 
     @Override
     public BaseResponseDto<List<Tag>> getAll() {
-        return new BaseResponseDto<>(1, "success", tagDao.getAll());
+        return new BaseResponseDto<>(HttpStatus.OK.value(), "success", tagDao.getAll());
     }
 }

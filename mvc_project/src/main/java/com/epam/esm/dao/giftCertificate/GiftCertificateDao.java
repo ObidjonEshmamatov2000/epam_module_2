@@ -2,8 +2,8 @@ package com.epam.esm.dao.giftCertificate;
 
 
 import com.epam.esm.dao.BaseDao;
-import com.epam.esm.model.giftCertificate.GiftCertificate;
-import com.epam.esm.model.tag.Tag;
+import com.epam.esm.domain.giftCertificate.GiftCertificate;
+import com.epam.esm.domain.tag.Tag;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,11 +1,14 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.domain.giftCertificate.GiftCertificate;
+import com.epam.esm.dto.BaseResponseDto;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.service.giftCertificate.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,32 +29,51 @@ public class GiftCertificateController {
             @RequestParam(required = false) boolean doDateSort,
             @RequestParam(required = false) boolean isDescending
     ){
-        return ResponseEntity.ok(giftCertificateService.getFilteredGifts(
-                searchWord, byTagName, doNameSort, doDateSort, isDescending));
+        BaseResponseDto<List<GiftCertificate>> filteredGifts =
+                giftCertificateService.getFilteredGifts(searchWord, byTagName, doNameSort, doDateSort, isDescending);
+        return ResponseEntity
+                .status(filteredGifts.getStatus())
+                .body(filteredGifts);
+
     }
 
     @RequestMapping(value = "/get_list", method = RequestMethod.GET, headers = "Accept=application/json")
     public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(giftCertificateService.getAll());
+        BaseResponseDto<List<GiftCertificate>> all = giftCertificateService.getAll();
+        return ResponseEntity
+                .status(all.getStatus())
+                .body(all);
     }
 
     @RequestMapping(value = "/get", method = RequestMethod.GET, headers = "Accept=application/json")
     public ResponseEntity<?> get(@RequestParam("id") UUID id) {
-        return ResponseEntity.ok(giftCertificateService.get(id));
+        BaseResponseDto<GiftCertificate> dto = giftCertificateService.get(id);
+        return ResponseEntity
+                .status(dto.getStatus())
+                .body(dto);
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, headers = "Accept=application/json")
     public ResponseEntity<?> create(@RequestBody GiftCertificateDto giftCertificateDto) {
-        return ResponseEntity.ok(giftCertificateService.create(giftCertificateDto));
+        BaseResponseDto<GiftCertificate> dto = giftCertificateService.create(giftCertificateDto);
+        return ResponseEntity
+                .status(dto.getStatus())
+                .body(dto);
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE, headers = "Accept=application/json")
     public ResponseEntity<?> delete(@RequestParam UUID id) {
-        return ResponseEntity.ok(giftCertificateService.delete(id));
+        BaseResponseDto<GiftCertificate> delete = giftCertificateService.delete(id);
+        return ResponseEntity
+                .status(delete.getStatus())
+                .body(delete);
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.PUT, headers = "Accept=application/json")
     public ResponseEntity<?> update(@RequestBody GiftCertificateDto giftCertificateDto) {
-        return ResponseEntity.ok(giftCertificateService.update(giftCertificateDto));
+        BaseResponseDto<GiftCertificate> update = giftCertificateService.update(giftCertificateDto);
+        return ResponseEntity
+                .status(update.getStatus())
+                .body(update);
     }
 }

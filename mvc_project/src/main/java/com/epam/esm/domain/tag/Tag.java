@@ -1,4 +1,4 @@
-package com.epam.esm.model.tag;
+package com.epam.esm.domain.tag;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

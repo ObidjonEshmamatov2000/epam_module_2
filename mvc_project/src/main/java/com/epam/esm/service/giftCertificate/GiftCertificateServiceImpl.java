@@ -2,17 +2,21 @@ package com.epam.esm.service.giftCertificate;
 
 import com.epam.esm.dao.giftCertificate.GiftCertificateDao;
 import com.epam.esm.dao.tag.TagDao;
+import com.epam.esm.domain.giftCertificate.GiftCertificate;
 import com.epam.esm.dto.BaseResponseDto;
 import com.epam.esm.dto.GiftCertificateDto;
-import com.epam.esm.model.giftCertificate.GiftCertificate;
+import com.epam.esm.exception.BaseException;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -32,22 +36,37 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     }
 
     @Override
+    @Transactional
     public BaseResponseDto<GiftCertificate> create(GiftCertificateDto giftCertificateDto) {
-        if (giftCertificateDto == null || giftCertificateDto.getName() == null) {
-            return new BaseResponseDto<>(-1, "unknown git certificate name");
-        }
+
+
+        checkIfGiftCertificateValid(giftCertificateDto);
 
         giftCertificateDto.setCreateDate(getCurrentTimeInIso8601());
         giftCertificateDto.setLastUpdateDate(getCurrentTimeInIso8601());
         giftCertificateDto.setId(UUID.randomUUID());
         GiftCertificate map = modelMapper.map(giftCertificateDto, GiftCertificate.class);
-        int created = giftCertificateDao.create(map);
+        GiftCertificate created = giftCertificateDao.create(map);
 
-        if (created == 1) {
-            createTags(giftCertificateDto);
-            return new BaseResponseDto<>(1, "success");
+        if (created == null) {
+            throw new BaseException(500, "failed to create gift certificate");
         }
-        return new BaseResponseDto<>(0, "failed to create gift certificate");
+
+        createTags(giftCertificateDto);
+        return new BaseResponseDto<>(HttpStatus.CREATED.value(), "success", created);
+    }
+
+    private void checkIfGiftCertificateValid(GiftCertificateDto gc) {
+        if (gc == null || gc.getName() == null || gc.getName().trim().length() == 0) {
+            throw new BaseException(400, "unsatisfied git certificate name");
+        }
+
+        if (
+                (gc.getDuration()!= null && gc.getDuration() < 0)
+                        || (gc.getPrice() != null && gc.getPrice().compareTo(BigDecimal.ZERO) < 0)
+        ) {
+            throw new BaseException(400, "price or duration is not preferable");
+        }
     }
 
     private void createTags(GiftCertificateDto giftCertificateDto) {
@@ -59,64 +78,57 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     @Override
     public BaseResponseDto<GiftCertificate> get(UUID id) {
         GiftCertificate giftCertificate = giftCertificateDao.get(id);
-        return new BaseResponseDto<>(1, "success", giftCertificate);
+        if (giftCertificate == null) {
+            throw new BaseException(500, "gift certificate not found");
+        }
+        return new BaseResponseDto<>(HttpStatus.OK.value(), "success", giftCertificate);
     }
 
     @Override
     public BaseResponseDto<GiftCertificate> delete(UUID id) {
         int delete = giftCertificateDao.delete(id);
 
-        if (delete == 1) {
-            return new BaseResponseDto<>(1, "success");
+        if (delete != 1) {
+            throw new BaseException(404, "failed to delete gift certificate");
         }
-        return new BaseResponseDto<>(0, "failed to delete gift certificate");
+        return new BaseResponseDto<>(HttpStatus.OK.value(), "success");
     }
 
 
     @Override
     public BaseResponseDto<List<GiftCertificate>> getAll() {
         List<GiftCertificate> all = giftCertificateDao.getAll();
-        return new BaseResponseDto<>(1, "success", all);
+        return new BaseResponseDto<>(HttpStatus.OK.value(), "success", all);
     }
 
     @Override
-    public BaseResponseDto<List<GiftCertificateDto>> getFilteredGifts(
+    public BaseResponseDto<List<GiftCertificate>> getFilteredGifts(
             String searchWord, String tagName, boolean doNameSort, boolean doDateSort, boolean isDescending
     ) {
         List<GiftCertificate> filteredGifts = giftCertificateDao.getFilteredGifts(
                 searchWord, tagName, doNameSort, doDateSort, isDescending);
 
         if (filteredGifts.size() == 0)
-            return new BaseResponseDto<>(0, "no certificates found");
+            return new BaseResponseDto<>(500, "no certificates found");
 
-        List<GiftCertificateDto> dtos = convertToDto(filteredGifts);
 
-        return new BaseResponseDto<>(1, "success", addTagsToGiftCertificateDtos(dtos));
+        return new BaseResponseDto<>(HttpStatus.OK.value(), "success", addTagsToGiftCertificates(filteredGifts));
     }
 
-    private List<GiftCertificateDto> convertToDto(List<GiftCertificate> certificates) {
-        return certificates.stream()
-                .map((certificate) ->
-                        modelMapper.map(certificate, GiftCertificateDto.class))
-                .collect(Collectors.toList());
-    }
-
-    private List<GiftCertificateDto> addTagsToGiftCertificateDtos(List<GiftCertificateDto> giftCertificateDtos) {
+    private List<GiftCertificate> addTagsToGiftCertificates(List<GiftCertificate> giftCertificateDtos) {
         return giftCertificateDtos.stream().peek(certificate ->
                         certificate.setTags(tagDao.getGiftCertificateWithTags(certificate.getId())))
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
     public BaseResponseDto<GiftCertificate> update(GiftCertificateDto update) {
         GiftCertificate old = giftCertificateDao.get(update.getId());
+
         update.setLastUpdateDate(getCurrentTimeInIso8601());
 
-        if (update.getDuration() < 0)
-        update.setDuration(old.getDuration());
-
-        if (update.getPrice() < 0)
-        update.setPrice(old.getPrice());
+        checkIfGiftCertificateValid(update);
 
         modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         modelMapper.map(update, old);
@@ -125,13 +137,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
 
         if (result == 1) {
             createTags(update);
-            return new BaseResponseDto<>(1, "success");
+            return new BaseResponseDto<>(HttpStatus.OK.value(), "success");
         }
-        return new BaseResponseDto<>(0, "failed to update");
+        return new BaseResponseDto<>(500, "failed to update");
     }
 
-    public String getCurrentTimeInIso8601() {
-//        return ZonedDateTime.now( ZoneOffset.UTC ).format( DateTimeFormatter.ISO_INSTANT );
-        return ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+    public LocalDateTime getCurrentTimeInIso8601() {
+        return ZonedDateTime.now( ZoneOffset.UTC ).toLocalDateTime();
     }
 }
