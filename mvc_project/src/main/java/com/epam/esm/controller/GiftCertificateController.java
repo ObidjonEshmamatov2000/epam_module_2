@@ -29,7 +29,7 @@ public class GiftCertificateController {
             @RequestParam(required = false) boolean doDateSort,
             @RequestParam(required = false) boolean isDescending
     ){
-        BaseResponseDto<List<GiftCertificate>> filteredGifts =
+        BaseResponseDto<List<GiftCertificateDto>> filteredGifts =
                 giftCertificateService.getFilteredGifts(searchWord, byTagName, doNameSort, doDateSort, isDescending);
         return ResponseEntity
                 .status(filteredGifts.getStatus())
@@ -39,7 +39,7 @@ public class GiftCertificateController {
 
     @RequestMapping(value = "/get_list", method = RequestMethod.GET, headers = "Accept=application/json")
     public ResponseEntity<?> getAll() {
-        BaseResponseDto<List<GiftCertificate>> all = giftCertificateService.getAll();
+        BaseResponseDto<List<GiftCertificateDto>> all = giftCertificateService.getAll();
         return ResponseEntity
                 .status(all.getStatus())
                 .body(all);
@@ -47,7 +47,7 @@ public class GiftCertificateController {
 
     @RequestMapping(value = "/get", method = RequestMethod.GET, headers = "Accept=application/json")
     public ResponseEntity<?> get(@RequestParam("id") UUID id) {
-        BaseResponseDto<GiftCertificate> dto = giftCertificateService.get(id);
+        BaseResponseDto<GiftCertificateDto> dto = giftCertificateService.get(id);
         return ResponseEntity
                 .status(dto.getStatus())
                 .body(dto);
@@ -55,7 +55,7 @@ public class GiftCertificateController {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, headers = "Accept=application/json")
     public ResponseEntity<?> create(@RequestBody GiftCertificateDto giftCertificateDto) {
-        BaseResponseDto<GiftCertificate> dto = giftCertificateService.create(giftCertificateDto);
+        BaseResponseDto<GiftCertificateDto> dto = giftCertificateService.create(giftCertificateDto);
         return ResponseEntity
                 .status(dto.getStatus())
                 .body(dto);
@@ -63,7 +63,7 @@ public class GiftCertificateController {
 
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE, headers = "Accept=application/json")
     public ResponseEntity<?> delete(@RequestParam UUID id) {
-        BaseResponseDto<GiftCertificate> delete = giftCertificateService.delete(id);
+        BaseResponseDto<GiftCertificateDto> delete = giftCertificateService.delete(id);
         return ResponseEntity
                 .status(delete.getStatus())
                 .body(delete);
@@ -71,7 +71,7 @@ public class GiftCertificateController {
 
     @RequestMapping(value = "/update", method = RequestMethod.PUT, headers = "Accept=application/json")
     public ResponseEntity<?> update(@RequestBody GiftCertificateDto giftCertificateDto) {
-        BaseResponseDto<GiftCertificate> update = giftCertificateService.update(giftCertificateDto);
+        BaseResponseDto<GiftCertificateDto> update = giftCertificateService.update(giftCertificateDto);
         return ResponseEntity
                 .status(update.getStatus())
                 .body(update);

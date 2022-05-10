@@ -16,6 +16,8 @@ import org.modelmapper.internal.InheritingConfiguration;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,7 +52,7 @@ public class GiftCertificateServiceTest {
         given(giftCertificateDao.create(giftCertificate)).willReturn(giftCertificate);
         given(modelMapper.map(giftCertificateDto, GiftCertificate.class)).willReturn(giftCertificate);
 
-        BaseResponseDto<GiftCertificate> dto = giftCertificateService.create(giftCertificateDto);
+        BaseResponseDto<GiftCertificateDto> dto = giftCertificateService.create(giftCertificateDto);
 
         assertEquals(201, dto.getStatus());
         assertEquals("success", dto.getMessage());
@@ -65,7 +67,7 @@ public class GiftCertificateServiceTest {
         giftCertificateDto.setId(giftCertificate.getId());
 
         given(giftCertificateDao.update(giftCertificate)).willReturn(1);
-        BaseResponseDto<GiftCertificate> update = giftCertificateService.update(giftCertificateDto);
+        BaseResponseDto<GiftCertificateDto> update = giftCertificateService.update(giftCertificateDto);
 
         assertEquals(200, update.getStatus());
         assertEquals("success", update.getMessage());
@@ -76,8 +78,9 @@ public class GiftCertificateServiceTest {
     @Test
     public void  testGetGiftCertificateById() {
         given(giftCertificateDao.get(giftCertificate.getId())).willReturn(giftCertificate);
-
-        BaseResponseDto<GiftCertificate> dto = giftCertificateService.get(giftCertificate.getId());
+        given(modelMapper.map(giftCertificate, GiftCertificateDto.class))
+                .willReturn(giftCertificateDto);
+        BaseResponseDto<GiftCertificateDto> dto = giftCertificateService.get(giftCertificate.getId());
 
         assertEquals(200, dto.getStatus());
         assertEquals("success", dto.getMessage());
@@ -85,35 +88,35 @@ public class GiftCertificateServiceTest {
         verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
     }
 
-//    @Test
-//    public void testGetAllGiftCertificates() {
-//        List<GiftCertificate> giftCertificates = new ArrayList<>();
-//        GiftCertificate gc1 =
-//                new GiftCertificate(UUID.randomUUID(), "a", "aa", 12.0, 2, "", "", null);
-//        GiftCertificate gc2 =
-//                new GiftCertificate(UUID.randomUUID(), "b", "bb", 12.0, 2, "", "", null);
-//        GiftCertificate gc3 =
-//                new GiftCertificate(UUID.randomUUID(), "c", "cc", 12.0, 2, "", "", null);
-//
-//        giftCertificates.add(gc1);
-//        giftCertificates.add(gc2);
-//        giftCertificates.add(gc3);
-//
-//        given(giftCertificateDao.getAll()).willReturn(giftCertificates);
-//
-//        BaseResponseDto<List<GiftCertificate>> all = giftCertificateService.getAll();
-//
-//        assertEquals(3, all.getData().size());
-//        assertEquals(1, all.getHttpStatus());
-//        assertEquals("success", all.getResponseMessage());
-//        verify(giftCertificateDao, times(1)).getAll();
-//    }
+    @Test
+    public void testGetAllGiftCertificates() {
+        List<GiftCertificate> giftCertificates = new ArrayList<>();
+        GiftCertificate gc1 =
+                new GiftCertificate(UUID.randomUUID(), "a", "aa", BigDecimal.valueOf(12.0), 2, LocalDateTime.now(), LocalDateTime.now(), null);
+        GiftCertificate gc2 =
+                new GiftCertificate(UUID.randomUUID(), "b", "bb", BigDecimal.valueOf(12.0), 2, LocalDateTime.now(), LocalDateTime.now(), null);
+        GiftCertificate gc3 =
+                new GiftCertificate(UUID.randomUUID(), "c", "cc", BigDecimal.valueOf(12.0), 2, LocalDateTime.now(), LocalDateTime.now(), null);
+
+        giftCertificates.add(gc1);
+        giftCertificates.add(gc2);
+        giftCertificates.add(gc3);
+
+        given(giftCertificateDao.getAll()).willReturn(giftCertificates);
+
+        BaseResponseDto<List<GiftCertificateDto>> all = giftCertificateService.getAll();
+
+        assertEquals(3, all.getData().size());
+        assertEquals(200, all.getStatus());
+        assertEquals("success", all.getMessage());
+        verify(giftCertificateDao, times(1)).getAll();
+    }
 
     @Test
     public void testDeleteGiftCertificate() {
         given(giftCertificateDao.delete(giftCertificate.getId())).willReturn(1);
 
-        BaseResponseDto<GiftCertificate> delete = giftCertificateService.delete(giftCertificate.getId());
+        BaseResponseDto<GiftCertificateDto> delete = giftCertificateService.delete(giftCertificate.getId());
 
         assertEquals(200, delete.getStatus());
         assertEquals("success", delete.getMessage());

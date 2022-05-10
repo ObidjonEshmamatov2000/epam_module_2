@@ -37,7 +37,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
 
     @Override
     @Transactional
-    public BaseResponseDto<GiftCertificate> create(GiftCertificateDto giftCertificateDto) {
+    public BaseResponseDto<GiftCertificateDto> create(GiftCertificateDto giftCertificateDto) {
 
 
         checkIfGiftCertificateValid(giftCertificateDto);
@@ -53,7 +53,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         }
 
         createTags(giftCertificateDto);
-        return new BaseResponseDto<>(HttpStatus.CREATED.value(), "success", created);
+        GiftCertificateDto certificateDto = modelMapper.map(map, GiftCertificateDto.class);
+        return new BaseResponseDto<>(HttpStatus.CREATED.value(), "success", certificateDto);
     }
 
     private void checkIfGiftCertificateValid(GiftCertificateDto gc) {
@@ -76,33 +77,41 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     }
 
     @Override
-    public BaseResponseDto<GiftCertificate> get(UUID id) {
+    public BaseResponseDto<GiftCertificateDto> get(UUID id) {
         GiftCertificate giftCertificate = giftCertificateDao.get(id);
         if (giftCertificate == null) {
             throw new BaseException(500, "gift certificate not found");
         }
-        return new BaseResponseDto<>(HttpStatus.OK.value(), "success", giftCertificate);
+        GiftCertificateDto certificateDto = modelMapper.map(giftCertificate, GiftCertificateDto.class);
+        return new BaseResponseDto<>(HttpStatus.OK.value(), "success", certificateDto);
     }
 
     @Override
-    public BaseResponseDto<GiftCertificate> delete(UUID id) {
+    public BaseResponseDto<GiftCertificateDto> delete(UUID id) {
         int delete = giftCertificateDao.delete(id);
 
         if (delete != 1) {
-            throw new BaseException(404, "failed to delete gift certificate");
+            throw new BaseException(400, "failed to delete gift certificate");
         }
         return new BaseResponseDto<>(HttpStatus.OK.value(), "success");
     }
 
 
     @Override
-    public BaseResponseDto<List<GiftCertificate>> getAll() {
+    public BaseResponseDto<List<GiftCertificateDto>> getAll() {
         List<GiftCertificate> all = giftCertificateDao.getAll();
-        return new BaseResponseDto<>(HttpStatus.OK.value(), "success", all);
+        return new BaseResponseDto<>(HttpStatus.OK.value(), "success", convertToDto(all));
+    }
+
+    List<GiftCertificateDto> convertToDto(List<GiftCertificate> certificates) {
+        return certificates.stream()
+                .map((certificate) ->
+                        modelMapper.map(certificate, GiftCertificateDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public BaseResponseDto<List<GiftCertificate>> getFilteredGifts(
+    public BaseResponseDto<List<GiftCertificateDto>> getFilteredGifts(
             String searchWord, String tagName, boolean doNameSort, boolean doDateSort, boolean isDescending
     ) {
         List<GiftCertificate> filteredGifts = giftCertificateDao.getFilteredGifts(
@@ -112,7 +121,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
             return new BaseResponseDto<>(500, "no certificates found");
 
 
-        return new BaseResponseDto<>(HttpStatus.OK.value(), "success", addTagsToGiftCertificates(filteredGifts));
+        return new BaseResponseDto<>(HttpStatus.OK.value(), "success",
+                convertToDto(addTagsToGiftCertificates(filteredGifts)));
     }
 
     private List<GiftCertificate> addTagsToGiftCertificates(List<GiftCertificate> giftCertificateDtos) {
@@ -123,7 +133,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
 
     @Override
     @Transactional
-    public BaseResponseDto<GiftCertificate> update(GiftCertificateDto update) {
+    public BaseResponseDto<GiftCertificateDto> update(GiftCertificateDto update) {
         GiftCertificate old = giftCertificateDao.get(update.getId());
 
         update.setLastUpdateDate(getCurrentTimeInIso8601());

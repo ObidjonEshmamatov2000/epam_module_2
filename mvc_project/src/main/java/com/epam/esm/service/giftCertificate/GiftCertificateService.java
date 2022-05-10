@@ -8,11 +8,11 @@ import com.epam.esm.service.BaseService;
 import java.util.List;
 
 
-public interface GiftCertificateService extends BaseService<GiftCertificate, GiftCertificateDto> {
-    BaseResponseDto<List<GiftCertificate>> getFilteredGifts(
+public interface GiftCertificateService extends BaseService<GiftCertificateDto> {
+    BaseResponseDto<List<GiftCertificateDto>> getFilteredGifts(
             String searchWord, String tagName, boolean doNameSort, boolean doDateSort, boolean isDescending
     );
 
-    BaseResponseDto<List<GiftCertificate>> getAll();
-    BaseResponseDto<GiftCertificate> update(GiftCertificateDto update);
+    BaseResponseDto<List<GiftCertificateDto>> getAll();
+    BaseResponseDto<GiftCertificateDto> update(GiftCertificateDto update);
 }

@@ -30,7 +30,7 @@ public class TagServiceImpl implements TagService{
         Tag create = tagDao.create(tag);
 
         if (create == null) {
-            throw new BaseException(404, "failed to create tag");
+            throw new BaseException(400, "failed to create tag");
         }
 
         return new BaseResponseDto<>(HttpStatus.CREATED.value(), "success", create);
@@ -38,7 +38,7 @@ public class TagServiceImpl implements TagService{
 
     private void checkIfTagValid(Tag tag) {
         if (tag == null || tag.getName() == null || tag.getName().trim().length() <= 0) {
-            throw new BaseException(404, "unsatisfied tag name");
+            throw new BaseException(400, "unsatisfied tag name");
         }
     }
 
@@ -47,7 +47,7 @@ public class TagServiceImpl implements TagService{
         Tag tag = tagDao.get(id);
 
         if (tag == null) {
-            throw new BaseException(404, "tag not found");
+            throw new BaseException(400, "tag not found");
         }
 
         return new BaseResponseDto<>(HttpStatus.OK.value(), "success", tag);
@@ -58,7 +58,7 @@ public class TagServiceImpl implements TagService{
         int deleted = tagDao.delete(id);
 
         if (deleted != 1) {
-            throw new BaseException(404, "failed to delete tag");
+            throw new BaseException(400, "failed to delete tag");
         }
         return new BaseResponseDto<>(HttpStatus.OK.value(), "success");
     }
