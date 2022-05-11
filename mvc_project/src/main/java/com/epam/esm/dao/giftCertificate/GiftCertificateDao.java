@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface GiftCertificateDao extends BaseDao<GiftCertificate> {
     int update(GiftCertificate updateCertificate);
 
-    void createTagsWithGiftCertificate(UUID certificateId, List<Tag> tags);
+    void createTagsWithGiftCertificate(UUID id, List<Tag> tags);
 
     List<GiftCertificate> getFilteredGifts(
             String searchWord, String tagName, boolean doNameSort, boolean doDateSort, boolean isDescending

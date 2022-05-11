@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/tag")
+@RequestMapping("/api/tags")
 public class TagController {
     private final TagService tagService;
 
@@ -20,7 +20,7 @@ public class TagController {
         this.tagService = tagService;
     }
 
-    @RequestMapping(value = "/get_list", method = RequestMethod.GET, headers = "Accept=application/json")
+    @RequestMapping(value = "", method = RequestMethod.GET, headers = "Accept=application/json")
     public ResponseEntity<?> getAll() {
         BaseResponseDto<List<Tag>> all = tagService.getAll();
         return ResponseEntity
@@ -28,15 +28,15 @@ public class TagController {
                 .body(all);
     }
 
-    @RequestMapping(value = "/get", method = RequestMethod.GET, headers = "Accept=application/json")
-    public ResponseEntity<?> get(@RequestParam UUID id) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, headers = "Accept=application/json")
+    public ResponseEntity<?> get(@PathVariable("id") UUID id) {
         BaseResponseDto<Tag> dto = tagService.get(id);
         return ResponseEntity
                 .status(dto.getStatus())
                 .body(dto);
     }
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST, headers = "Accept=application/json")
+    @RequestMapping(value = "", method = RequestMethod.POST, headers = "Accept=application/json")
     public ResponseEntity<?> create(@RequestBody Tag tag) {
         BaseResponseDto<Tag> dto = tagService.create(tag);
         return ResponseEntity
@@ -44,8 +44,8 @@ public class TagController {
                 .body(dto);
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE, headers = "Accept=application/json")
-    public ResponseEntity<?> deleteTag(@RequestParam UUID id) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, headers = "Accept=application/json")
+    public ResponseEntity<?> deleteTag(@PathVariable("id") UUID id) {
         BaseResponseDto<Tag> delete = tagService.delete(id);
         return ResponseEntity
                 .status(delete.getStatus())

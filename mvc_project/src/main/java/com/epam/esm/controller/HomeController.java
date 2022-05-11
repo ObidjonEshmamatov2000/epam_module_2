@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HomeController {
-
     @RequestMapping(value = "/", method = RequestMethod.GET, headers = "Accept=application/json")
     public String home() {
         return "home";

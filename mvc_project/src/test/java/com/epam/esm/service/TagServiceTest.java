@@ -46,16 +46,6 @@ public class TagServiceTest {
     }
 
     @Test
-    public void testCreateTagMethodThrowsException() {
-        given(tagDao.create(tag)).willReturn(null);
-
-        assertThrows(BaseException.class, () -> {
-            tagService.create(tag);
-        });
-        Mockito.verify(tagDao, Mockito.times(1)).create(tag);
-    }
-
-    @Test
     public void testGetTagById() {
         given(tagDao.get(tag.getId())).willReturn(tag);
 
@@ -63,18 +53,7 @@ public class TagServiceTest {
 
         assertEquals(200, tagBaseResponseDto.getStatus());
         assertEquals("success", tagBaseResponseDto.getMessage());
-        assertEquals("testTag", tagBaseResponseDto.getData().getName());
-
-        Mockito.verify(tagDao, Mockito.times(1)).get(tag.getId());
-    }
-
-    @Test
-    public void testGetTagByIdThrowsException() {
-        given(tagDao.get(tag.getId())).willReturn(null);
-
-        assertThrows(BaseException.class, () -> {
-            tagService.get(tag.getId());
-        });
+        assertEquals(tag.getName(), tagBaseResponseDto.getData().getName());
 
         Mockito.verify(tagDao, Mockito.times(1)).get(tag.getId());
     }
@@ -114,9 +93,7 @@ public class TagServiceTest {
     public void testDeleteTagThrowsException() {
         given(tagDao.delete(tag.getId())).willReturn(0);
 
-        assertThrows(BaseException.class, () -> {
-            tagService.delete(tag.getId());
-        });
+        assertThrows(BaseException.class, () -> tagService.delete(tag.getId()));
         Mockito.verify(tagDao, Mockito.times(1)).delete(tag.getId());
     }
 }

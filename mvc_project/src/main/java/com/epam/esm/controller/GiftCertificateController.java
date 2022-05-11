@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/gift_certificate")
+@RequestMapping("/api/gift_certificates")
 public class GiftCertificateController {
     private final GiftCertificateService giftCertificateService;
 
@@ -21,7 +21,7 @@ public class GiftCertificateController {
         this.giftCertificateService = giftCertificateService;
     }
 
-    @RequestMapping(value = "/get_filter", method = RequestMethod.GET, headers = "Accept=application/json")
+    @RequestMapping(value = "/filter", method = RequestMethod.GET, headers = "Accept=application/json")
     public ResponseEntity<?> getFilteredGifts(
             @RequestParam(required = false) String searchWord,
             @RequestParam(required = false) String byTagName,
@@ -37,7 +37,7 @@ public class GiftCertificateController {
 
     }
 
-    @RequestMapping(value = "/get_list", method = RequestMethod.GET, headers = "Accept=application/json")
+    @RequestMapping(value = "", method = RequestMethod.GET, headers = "Accept=application/json")
     public ResponseEntity<?> getAll() {
         BaseResponseDto<List<GiftCertificateDto>> all = giftCertificateService.getAll();
         return ResponseEntity
@@ -45,15 +45,15 @@ public class GiftCertificateController {
                 .body(all);
     }
 
-    @RequestMapping(value = "/get", method = RequestMethod.GET, headers = "Accept=application/json")
-    public ResponseEntity<?> get(@RequestParam("id") UUID id) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, headers = "Accept=application/json")
+    public ResponseEntity<?> get(@PathVariable("id") UUID id) {
         BaseResponseDto<GiftCertificateDto> dto = giftCertificateService.get(id);
         return ResponseEntity
                 .status(dto.getStatus())
                 .body(dto);
     }
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST, headers = "Accept=application/json")
+    @RequestMapping(value = "", method = RequestMethod.POST, headers = "Accept=application/json")
     public ResponseEntity<?> create(@RequestBody GiftCertificateDto giftCertificateDto) {
         BaseResponseDto<GiftCertificateDto> dto = giftCertificateService.create(giftCertificateDto);
         return ResponseEntity
@@ -61,15 +61,15 @@ public class GiftCertificateController {
                 .body(dto);
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE, headers = "Accept=application/json")
-    public ResponseEntity<?> delete(@RequestParam UUID id) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, headers = "Accept=application/json")
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
         BaseResponseDto<GiftCertificateDto> delete = giftCertificateService.delete(id);
         return ResponseEntity
                 .status(delete.getStatus())
                 .body(delete);
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.PUT, headers = "Accept=application/json")
+    @RequestMapping(value = "", method = RequestMethod.PUT, headers = "Accept=application/json")
     public ResponseEntity<?> update(@RequestBody GiftCertificateDto giftCertificateDto) {
         BaseResponseDto<GiftCertificateDto> update = giftCertificateService.update(giftCertificateDto);
         return ResponseEntity

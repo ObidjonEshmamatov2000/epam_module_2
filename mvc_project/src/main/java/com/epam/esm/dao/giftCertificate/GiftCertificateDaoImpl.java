@@ -55,7 +55,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             return jdbcTemplate.queryForObject(query, new GiftCertificateMapper(), id);
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());
-            throw new BaseException(400, "gift certificate with id " + id + " is not found");
+            throw new BaseException(404, "gift certificate with id " + id + " is not found");
         }
     }
 
@@ -73,12 +73,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     @Override
     public int delete(UUID id) {
         jdbcTemplate.update("delete from gift_certificate_tag where gift_certificate_id = ?", id);
-        try {
-            return jdbcTemplate.update("delete from gift_certificate where id = ?", id);
-        } catch (Exception e) {
-            log.error(e.getLocalizedMessage());
-            throw new BaseException(400, "gift certificate with id " + id + " is not found");
-        }
+        return jdbcTemplate.update("delete from gift_certificate where id = ?", id);
     }
 
     @Override
@@ -98,7 +93,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
                     gc.getId());
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());
-            throw new BaseException(400, "gift certificate with id " + gc.getId() + " is not found");
+            throw new BaseException(404, "gift certificate with id " + gc.getId() + " is not found");
         }
     }
 
@@ -142,6 +137,5 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             log.error(e.getLocalizedMessage());
             throw new BaseException(500, e.getLocalizedMessage());
         }
-
     }
 }

@@ -57,23 +57,11 @@ public class GiftCertificateServiceTest {
         BaseResponseDto<GiftCertificateDto> dto = giftCertificateService.create(giftCertificateDto);
         GiftCertificateDto data = dto.getData();
         assertEquals(201, dto.getStatus());
-        assertEquals("test", data.getName());
-        assertEquals("test desc", data.getDescription());
-        assertEquals(BigDecimal.valueOf(123.0), data.getPrice());
-        assertEquals(23, data.getDuration());
+        assertEquals(giftCertificate.getName(), data.getName());
+        assertEquals(giftCertificate.getDescription(), data.getDescription());
+        assertEquals(giftCertificate.getPrice(), data.getPrice());
+        assertEquals(giftCertificate.getDuration(), data.getDuration());
         assertEquals("success", dto.getMessage());
-        verify(giftCertificateDao, times(1)).create(giftCertificate);
-    }
-
-    @Test
-    public void testCreateGiftCertificateThrowsException() {
-        given(modelMapper.map(giftCertificateDto, GiftCertificate.class)).willReturn(giftCertificate);
-        given(giftCertificateDao.create(giftCertificate)).willReturn(null);
-
-
-        assertThrows(BaseException.class, () -> {
-            giftCertificateService.create(giftCertificateDto);
-        });
         verify(giftCertificateDao, times(1)).create(giftCertificate);
     }
 
@@ -101,9 +89,7 @@ public class GiftCertificateServiceTest {
 
         given(giftCertificateDao.update(giftCertificate)).willReturn(0);
 
-        assertThrows(BaseException.class, () -> {
-            giftCertificateService.update(giftCertificateDto);
-        });
+        assertThrows(BaseException.class, () -> giftCertificateService.update(giftCertificateDto));
         verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
         verify(giftCertificateDao, times(1)).update(giftCertificate);
     }
@@ -117,21 +103,10 @@ public class GiftCertificateServiceTest {
 
         assertEquals(200, dto.getStatus());
         assertEquals("success", dto.getMessage());
-        assertEquals("test", dto.getData().getName());
-        assertEquals("test desc", dto.getData().getDescription());
-        assertEquals(BigDecimal.valueOf(123.0), dto.getData().getPrice());
-        assertEquals(23, dto.getData().getDuration());
-        verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
-    }
-
-
-    @Test
-    public void  testGetGiftCertificateByIdThrowsException() {
-        given(giftCertificateDao.get(giftCertificate.getId())).willReturn(null);
-
-        assertThrows(BaseException.class, () -> {
-            giftCertificateService.get(giftCertificate.getId());
-        });
+        assertEquals(giftCertificate.getName(), dto.getData().getName());
+        assertEquals(giftCertificate.getDescription(), dto.getData().getDescription());
+        assertEquals(giftCertificate.getPrice(), dto.getData().getPrice());
+        assertEquals(giftCertificate.getDuration(), dto.getData().getDuration());
         verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
     }
 
@@ -197,9 +172,7 @@ public class GiftCertificateServiceTest {
     public void testDeleteGiftCertificateThrowsException() {
         given(giftCertificateDao.delete(giftCertificate.getId())).willReturn(0);
 
-        assertThrows(BaseException.class, () -> {
-            giftCertificateService.delete(giftCertificate.getId());
-        });
+        assertThrows(BaseException.class, () -> giftCertificateService.delete(giftCertificate.getId()));
         verify(giftCertificateDao, times(1)).delete(giftCertificate.getId());
     }
 }

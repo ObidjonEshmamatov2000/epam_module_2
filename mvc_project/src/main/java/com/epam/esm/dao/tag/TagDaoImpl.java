@@ -29,7 +29,7 @@ public class TagDaoImpl implements TagDao{
             return tag;
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());
-            throw new BaseException(500, "tag with name " + tag.getName() + " is already exist");
+            throw new BaseException(400, "tag with name " + tag.getName() + " is already exist");
         }
     }
 
@@ -39,7 +39,7 @@ public class TagDaoImpl implements TagDao{
             return jdbcTemplate.queryForObject("select id, name from tag where id = ?", new TagMapper(), id);
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());
-            throw new BaseException(400, "tag with id " + id + " is not found");
+            throw new BaseException(404, "tag with id " + id + " is not found");
         }
     }
 
@@ -55,12 +55,7 @@ public class TagDaoImpl implements TagDao{
 
     @Override
     public int delete(UUID id) {
-        try {
-            return jdbcTemplate.update("delete from tag where id = ?", id);
-        } catch (Exception e) {
-            log.error(e.getLocalizedMessage());
-            throw new BaseException(400, e.getLocalizedMessage());
-        }
+        return jdbcTemplate.update("delete from tag where id = ?", id);
     }
 
     @Override
@@ -79,7 +74,7 @@ public class TagDaoImpl implements TagDao{
             return jdbcTemplate.query("select * from get_tags_by_gift_certificate_id(?)", new TagMapper(), id);
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());
-            throw new BaseException(400, "tag with id " + id + " is not found");
+            throw new BaseException(404, "tag with id " + id + " is not found");
         }
     }
 }

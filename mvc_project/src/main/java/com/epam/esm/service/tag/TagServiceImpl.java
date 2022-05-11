@@ -25,16 +25,10 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public BaseResponseDto<Tag> create(Tag tag) {
-
         checkIfTagValid(tag);
 
         tag.setId(UUID.randomUUID());
         Tag create = tagDao.create(tag);
-
-        if (create == null) {
-            log.info("failed to create tag with name = " + tag.getName(), tag);
-            throw new BaseException(400, "failed to create tag");
-        }
 
         log.info("tag with name = " + tag.getName() + " successfully created");
         return new BaseResponseDto<>(HttpStatus.CREATED.value(), "success", create);
@@ -49,12 +43,6 @@ public class TagServiceImpl implements TagService{
     @Override
     public BaseResponseDto<Tag> get(UUID id) {
         Tag tag = tagDao.get(id);
-
-        if (tag == null) {
-            log.info("tag with id = " + id + " is not found in the database");
-            throw new BaseException(400, "tag not found");
-        }
-
         log.info("tag with id " + id + " is send to the client");
         return new BaseResponseDto<>(HttpStatus.OK.value(), "success", tag);
     }
@@ -65,7 +53,7 @@ public class TagServiceImpl implements TagService{
 
         if (deleted != 1) {
             log.info("tag with id" + id + " is not present in the database");
-            throw new BaseException(400, "failed to delete tag");
+            throw new BaseException(400, "failed to delete tag with id " + id);
         }
 
         log.info("tag with id " + id + " is deleted successfully");

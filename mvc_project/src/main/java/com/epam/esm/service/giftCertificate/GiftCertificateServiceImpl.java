@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class GiftCertificateServiceImpl implements GiftCertificateService{
-
     private final GiftCertificateDao giftCertificateDao;
     private final TagDao tagDao;
     private final ModelMapper modelMapper;
@@ -40,8 +39,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     @Override
     @Transactional
     public BaseResponseDto<GiftCertificateDto> create(GiftCertificateDto giftCertificateDto) {
-
-
         checkIfGiftCertificateValid(giftCertificateDto);
 
         giftCertificateDto.setCreateDate(getCurrentTimeInIso8601());
@@ -50,13 +47,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         GiftCertificate map = modelMapper.map(giftCertificateDto, GiftCertificate.class);
         GiftCertificate created = giftCertificateDao.create(map);
 
-        if (created == null) {
-            log.info("gift certificate with name " + giftCertificateDto.getName() + " is not created in the database");
-            throw new BaseException(500, "failed to create gift certificate");
-        }
-
         createTags(giftCertificateDto);
-        GiftCertificateDto certificateDto = modelMapper.map(map, GiftCertificateDto.class);
+        GiftCertificateDto certificateDto = modelMapper.map(created, GiftCertificateDto.class);
         log.info("gift certificate with name " + giftCertificateDto.getName() + " is created in the database");
         return new BaseResponseDto<>(HttpStatus.CREATED.value(), "success", certificateDto);
     }
@@ -68,7 +60,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         }
 
         if (
-
                 (gc.getDuration()!= null && gc.getDuration() < 0)
                         || (gc.getPrice() != null && gc.getPrice().compareTo(BigDecimal.ZERO) < 0)
         ) {
@@ -86,10 +77,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     @Override
     public BaseResponseDto<GiftCertificateDto> get(UUID id) {
         GiftCertificate giftCertificate = giftCertificateDao.get(id);
-        if (giftCertificate == null) {
-            log.info("gift certificate with id " + id + " is not found in the database");
-            throw new BaseException(500, "gift certificate not found");
-        }
         GiftCertificateDto certificateDto = modelMapper.map(giftCertificate, GiftCertificateDto.class);
         log.info("gift certificate with id " + id + " is sent to the user successfully");
         return new BaseResponseDto<>(HttpStatus.OK.value(), "success", certificateDto);
@@ -101,7 +88,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
 
         if (delete != 1) {
             log.info("gift certificate with id " + id + " is not found in the database");
-            throw new BaseException(400, "failed to delete gift certificate");
+            throw new BaseException(400, "failed to delete gift certificate with id " + id);
         }
         log.info("gift certificate with id " + id + " is deleted successfully");
         return new BaseResponseDto<>(HttpStatus.OK.value(), "success");
@@ -148,16 +135,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     @Transactional
     public BaseResponseDto<GiftCertificateDto> update(GiftCertificateDto update) {
         GiftCertificate old = giftCertificateDao.get(update.getId());
-
         update.setLastUpdateDate(getCurrentTimeInIso8601());
-
         checkIfGiftCertificateValid(update);
 
         modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         modelMapper.map(update, old);
 
         int result = giftCertificateDao.update(old);
-
         if (result != 1) {
             log.info("gift certificate with id " + update.getId() + " is not updated in the database");
             throw new BaseException(500, "failed to update");

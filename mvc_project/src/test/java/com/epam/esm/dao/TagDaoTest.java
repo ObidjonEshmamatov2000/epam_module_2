@@ -31,26 +31,17 @@ class TagDaoTest {
     @Resource
     private JdbcTemplate jdbcTemplate;
 
-
-    @BeforeEach
-    void setUp() {
-
-
-    }
-
     @Test
     public void canCreateTag(){
         createTestObjects();
         Tag tag = new Tag(UUID.randomUUID(), "test");
         Tag i = tagDAO.create(tag);
-
         assertEquals("test", i.getName());
     }
 
     @Test
     public void canGetTagById(){
         Tag tag = tagDAO.get(UUID.fromString("64eeb184-972c-4bef-9879-c003d7352bd0"));
-
         assertNotNull(tag);
     }
 

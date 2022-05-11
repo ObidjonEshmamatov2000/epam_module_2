@@ -4,7 +4,6 @@ import com.epam.esm.config.TestConfig;
 import com.epam.esm.dao.giftCertificate.GiftCertificateDaoImpl;
 import com.epam.esm.domain.giftCertificate.GiftCertificate;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,13 +29,6 @@ public class GiftCertificateDaoTest {
 
     @Resource
     private JdbcTemplate jdbcTemplate;
-
-
-    @BeforeEach
-    void setUp() {
-
-    }
-
 
     @Test
     public void testCreateGiftCertificate() {
