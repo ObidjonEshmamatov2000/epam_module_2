@@ -3,6 +3,7 @@ package com.epam.esm.dao.tag;
 import com.epam.esm.domain.tag.Tag;
 import com.epam.esm.domain.tag.TagMapper;
 import com.epam.esm.exception.BaseException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@Slf4j
 public class TagDaoImpl implements TagDao{
 
     private final JdbcTemplate jdbcTemplate;
@@ -26,6 +28,7 @@ public class TagDaoImpl implements TagDao{
             jdbcTemplate.update("insert into tag(id, name) values (?, ?)", tag.getId(), tag.getName());
             return tag;
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(500, "tag with name " + tag.getName() + " is already exist");
         }
     }
@@ -35,6 +38,7 @@ public class TagDaoImpl implements TagDao{
         try {
             return jdbcTemplate.queryForObject("select id, name from tag where id = ?", new TagMapper(), id);
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(400, "tag with id " + id + " is not found");
         }
     }
@@ -44,6 +48,7 @@ public class TagDaoImpl implements TagDao{
         try {
             return jdbcTemplate.query("select id, name from tag", new TagMapper());
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(500, e.getLocalizedMessage());
         }
     }
@@ -53,6 +58,7 @@ public class TagDaoImpl implements TagDao{
         try {
             return jdbcTemplate.update("delete from tag where id = ?", id);
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(400, e.getLocalizedMessage());
         }
     }
@@ -62,6 +68,7 @@ public class TagDaoImpl implements TagDao{
         try {
             return jdbcTemplate.queryForObject("select id, name from tag where name = ?", new TagMapper() ,tagName);
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(500, e.getLocalizedMessage());
         }
     }
@@ -71,6 +78,7 @@ public class TagDaoImpl implements TagDao{
         try {
             return jdbcTemplate.query("select * from get_tags_by_gift_certificate_id(?)", new TagMapper(), id);
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(400, "tag with id " + id + " is not found");
         }
     }

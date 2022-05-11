@@ -5,6 +5,7 @@ import com.epam.esm.domain.giftCertificate.GiftCertificateMapper;
 import com.epam.esm.domain.tag.Tag;
 import com.epam.esm.domain.tag.TagMapper;
 import com.epam.esm.exception.BaseException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@Slf4j
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private final JdbcTemplate jdbcTemplate;
 
@@ -41,6 +43,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
             return gc;
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(400, "gift certificate with name " + gc.getName() + " is already exist");
         }
     }
@@ -51,6 +54,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         try {
             return jdbcTemplate.queryForObject(query, new GiftCertificateMapper(), id);
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(400, "gift certificate with id " + id + " is not found");
         }
     }
@@ -61,6 +65,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         try {
             return jdbcTemplate.query(query, new GiftCertificateMapper());
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(500, e.getLocalizedMessage());
         }
     }
@@ -71,6 +76,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         try {
             return jdbcTemplate.update("delete from gift_certificate where id = ?", id);
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(400, "gift certificate with id " + id + " is not found");
         }
     }
@@ -91,6 +97,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
                     gc.getLastUpdateDate(),
                     gc.getId());
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(400, "gift certificate with id " + gc.getId() + " is not found");
         }
     }
@@ -132,6 +139,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
                     new GiftCertificateMapper(),
                     searchWord, tagName, doNameSort, doDateSort, isDescending);
         } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
             throw new BaseException(500, e.getLocalizedMessage());
         }
 

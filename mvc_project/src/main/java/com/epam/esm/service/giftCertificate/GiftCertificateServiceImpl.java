@@ -6,6 +6,7 @@ import com.epam.esm.domain.giftCertificate.GiftCertificate;
 import com.epam.esm.dto.BaseResponseDto;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.exception.BaseException;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class GiftCertificateServiceImpl implements GiftCertificateService{
 
     private final GiftCertificateDao giftCertificateDao;
@@ -49,23 +51,28 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         GiftCertificate created = giftCertificateDao.create(map);
 
         if (created == null) {
+            log.info("gift certificate with name " + giftCertificateDto.getName() + " is not created in the database");
             throw new BaseException(500, "failed to create gift certificate");
         }
 
         createTags(giftCertificateDto);
         GiftCertificateDto certificateDto = modelMapper.map(map, GiftCertificateDto.class);
+        log.info("gift certificate with name " + giftCertificateDto.getName() + " is created in the database");
         return new BaseResponseDto<>(HttpStatus.CREATED.value(), "success", certificateDto);
     }
 
     private void checkIfGiftCertificateValid(GiftCertificateDto gc) {
         if (gc == null || gc.getName() == null || gc.getName().trim().length() == 0) {
+            log.info("gift certificate with name is not acceptable");
             throw new BaseException(400, "unsatisfied git certificate name");
         }
 
         if (
+
                 (gc.getDuration()!= null && gc.getDuration() < 0)
                         || (gc.getPrice() != null && gc.getPrice().compareTo(BigDecimal.ZERO) < 0)
         ) {
+            log.info("price or duration of gift certificate is not acceptable");
             throw new BaseException(400, "price or duration is not preferable");
         }
     }
@@ -80,9 +87,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     public BaseResponseDto<GiftCertificateDto> get(UUID id) {
         GiftCertificate giftCertificate = giftCertificateDao.get(id);
         if (giftCertificate == null) {
+            log.info("gift certificate with id " + id + " is not found in the database");
             throw new BaseException(500, "gift certificate not found");
         }
         GiftCertificateDto certificateDto = modelMapper.map(giftCertificate, GiftCertificateDto.class);
+        log.info("gift certificate with id " + id + " is sent to the user successfully");
         return new BaseResponseDto<>(HttpStatus.OK.value(), "success", certificateDto);
     }
 
@@ -91,8 +100,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         int delete = giftCertificateDao.delete(id);
 
         if (delete != 1) {
+            log.info("gift certificate with id " + id + " is not found in the database");
             throw new BaseException(400, "failed to delete gift certificate");
         }
+        log.info("gift certificate with id " + id + " is deleted successfully");
         return new BaseResponseDto<>(HttpStatus.OK.value(), "success");
     }
 
@@ -100,6 +111,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     @Override
     public BaseResponseDto<List<GiftCertificateDto>> getAll() {
         List<GiftCertificate> all = giftCertificateDao.getAll();
+        log.info("all gift certificates send to the user");
         return new BaseResponseDto<>(HttpStatus.OK.value(), "success", convertToDto(all));
     }
 
@@ -117,9 +129,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         List<GiftCertificate> filteredGifts = giftCertificateDao.getFilteredGifts(
                 searchWord, tagName, doNameSort, doDateSort, isDescending);
 
-        if (filteredGifts.size() == 0)
-            return new BaseResponseDto<>(500, "no certificates found");
-
+        if (filteredGifts.size() == 0) {
+            log.info("no gift certificate matches given filter arguments");
+            return new BaseResponseDto<>(HttpStatus.OK.value(), "no certificates found");
+        }
 
         return new BaseResponseDto<>(HttpStatus.OK.value(), "success",
                 convertToDto(addTagsToGiftCertificates(filteredGifts)));
@@ -145,11 +158,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
 
         int result = giftCertificateDao.update(old);
 
-        if (result == 1) {
-            createTags(update);
-            return new BaseResponseDto<>(HttpStatus.OK.value(), "success");
+        if (result != 1) {
+            log.info("gift certificate with id " + update.getId() + " is not updated in the database");
+            throw new BaseException(500, "failed to update");
         }
-        return new BaseResponseDto<>(500, "failed to update");
+        createTags(update);
+        log.info("gift certificate with id " + update.getId() + " is successfully updated in the database");
+        return new BaseResponseDto<>(HttpStatus.OK.value(), "success");
     }
 
     public LocalDateTime getCurrentTimeInIso8601() {

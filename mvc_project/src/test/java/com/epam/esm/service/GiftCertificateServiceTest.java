@@ -4,6 +4,7 @@ import com.epam.esm.dao.giftCertificate.GiftCertificateDao;
 import com.epam.esm.domain.giftCertificate.GiftCertificate;
 import com.epam.esm.dto.BaseResponseDto;
 import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.exception.BaseException;
 import com.epam.esm.service.giftCertificate.GiftCertificateServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,11 +52,28 @@ public class GiftCertificateServiceTest {
     public void testCreateGiftCertificate() {
         given(giftCertificateDao.create(giftCertificate)).willReturn(giftCertificate);
         given(modelMapper.map(giftCertificateDto, GiftCertificate.class)).willReturn(giftCertificate);
+        given(modelMapper.map(giftCertificate, GiftCertificateDto.class)).willReturn(giftCertificateDto);
 
         BaseResponseDto<GiftCertificateDto> dto = giftCertificateService.create(giftCertificateDto);
-
+        GiftCertificateDto data = dto.getData();
         assertEquals(201, dto.getStatus());
+        assertEquals("test", data.getName());
+        assertEquals("test desc", data.getDescription());
+        assertEquals(BigDecimal.valueOf(123.0), data.getPrice());
+        assertEquals(23, data.getDuration());
         assertEquals("success", dto.getMessage());
+        verify(giftCertificateDao, times(1)).create(giftCertificate);
+    }
+
+    @Test
+    public void testCreateGiftCertificateThrowsException() {
+        given(modelMapper.map(giftCertificateDto, GiftCertificate.class)).willReturn(giftCertificate);
+        given(giftCertificateDao.create(giftCertificate)).willReturn(null);
+
+
+        assertThrows(BaseException.class, () -> {
+            giftCertificateService.create(giftCertificateDto);
+        });
         verify(giftCertificateDao, times(1)).create(giftCertificate);
     }
 
@@ -70,7 +88,22 @@ public class GiftCertificateServiceTest {
         BaseResponseDto<GiftCertificateDto> update = giftCertificateService.update(giftCertificateDto);
 
         assertEquals(200, update.getStatus());
-        assertEquals("success", update.getMessage());
+        verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
+        verify(giftCertificateDao, times(1)).update(giftCertificate);
+    }
+
+    @Test
+    public void testUpdateGiftCertificateThrowsException() {
+        given(giftCertificateDao.get(giftCertificate.getId())).willReturn(giftCertificate); //old
+        given(modelMapper.getConfiguration()).willReturn(new InheritingConfiguration());
+        doNothing().when(modelMapper).map(giftCertificateDto, giftCertificate);
+        giftCertificateDto.setId(giftCertificate.getId());
+
+        given(giftCertificateDao.update(giftCertificate)).willReturn(0);
+
+        assertThrows(BaseException.class, () -> {
+            giftCertificateService.update(giftCertificateDto);
+        });
         verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
         verify(giftCertificateDao, times(1)).update(giftCertificate);
     }
@@ -85,6 +118,20 @@ public class GiftCertificateServiceTest {
         assertEquals(200, dto.getStatus());
         assertEquals("success", dto.getMessage());
         assertEquals("test", dto.getData().getName());
+        assertEquals("test desc", dto.getData().getDescription());
+        assertEquals(BigDecimal.valueOf(123.0), dto.getData().getPrice());
+        assertEquals(23, dto.getData().getDuration());
+        verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
+    }
+
+
+    @Test
+    public void  testGetGiftCertificateByIdThrowsException() {
+        given(giftCertificateDao.get(giftCertificate.getId())).willReturn(null);
+
+        assertThrows(BaseException.class, () -> {
+            giftCertificateService.get(giftCertificate.getId());
+        });
         verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
     }
 
@@ -113,6 +160,29 @@ public class GiftCertificateServiceTest {
     }
 
     @Test
+    public void testFilteredGiftCertificates() {
+        List<GiftCertificate> giftCertificates = new ArrayList<>();
+        GiftCertificate gc2 =
+                new GiftCertificate(UUID.randomUUID(), "bc", "bb", BigDecimal.valueOf(12.0), 2, LocalDateTime.now(), LocalDateTime.now(), null);
+        GiftCertificate gc3 =
+                new GiftCertificate(UUID.randomUUID(), "c", "cc", BigDecimal.valueOf(12.0), 2, LocalDateTime.now(), LocalDateTime.now(), null);
+
+//        giftCertificates.add(gc2);
+//        giftCertificates.add(gc3);
+
+        given(giftCertificateDao.getFilteredGifts("c", null, false, false, false)).willReturn(giftCertificates);
+
+
+        BaseResponseDto<List<GiftCertificateDto>> all =
+                giftCertificateService.getFilteredGifts("c", null, false, false, false);
+
+//        assertEquals(0, all.getData().size());
+        assertEquals(200, all.getStatus());
+        assertEquals("no certificates found", all.getMessage());
+        verify(giftCertificateDao, times(1)).getFilteredGifts("c", null, false, false, false );
+    }
+
+    @Test
     public void testDeleteGiftCertificate() {
         given(giftCertificateDao.delete(giftCertificate.getId())).willReturn(1);
 
@@ -123,4 +193,13 @@ public class GiftCertificateServiceTest {
         verify(giftCertificateDao, times(1)).delete(giftCertificate.getId());
     }
 
+    @Test
+    public void testDeleteGiftCertificateThrowsException() {
+        given(giftCertificateDao.delete(giftCertificate.getId())).willReturn(0);
+
+        assertThrows(BaseException.class, () -> {
+            giftCertificateService.delete(giftCertificate.getId());
+        });
+        verify(giftCertificateDao, times(1)).delete(giftCertificate.getId());
+    }
 }

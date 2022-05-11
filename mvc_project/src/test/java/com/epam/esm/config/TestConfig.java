@@ -1,6 +1,7 @@
 package com.epam.esm.config;
 
 
+import com.epam.esm.dao.giftCertificate.GiftCertificateDaoImpl;
 import com.epam.esm.dao.tag.TagDaoImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,11 @@ public class TestConfig {
     @Bean
     public TagDaoImpl tagDAO(JdbcTemplate jdbcTemplate){
         return new TagDaoImpl(jdbcTemplate);
+    }
+
+    @Bean
+    public GiftCertificateDaoImpl giftCertificateDao(JdbcTemplate jdbcTemplate) {
+        return new GiftCertificateDaoImpl(jdbcTemplate);
     }
 }
 
